@@ -31,15 +31,6 @@ class FiveInRowState(State):
         return FiveInRowState(new_board, -1 * self.player)
 
     def is_terminal(self):
-        # for row in self.board:
-        #     count = 0
-        #     for cell in row:
-        #         if count == 5:
-        #             return True
-        #         if cell == self.player * -1:
-        #             count += 1
-        #         else:
-        #             count = 0
         for i in range(self.size):
             count_row = 0
             count_column = 0
@@ -55,12 +46,28 @@ class FiveInRowState(State):
                 else:
                     count_column = 0
 
+        for i in range(4, self.size):
+            for j in range(self.size - 4):
+                if self.board[i, j] == self.player * -1 and self.board[i - 1, j + 1] == self.player * -1 and \
+                        self.board[i - 2, j + 2] == self.player * -1 and self.board[i - 3, j + 3] == self.player * -1 \
+                        and self.board[i - 4, j + 4] == self.player * -1:
+                    return True
+
+        for i in range(4, self.size):
+            for j in range(4, self.size):
+                if self.board[i, j] == self.player * -1 and self.board[i - 1, j - 1] == self.player * -1 and \
+                        self.board[i - 2, j - 2] == self.player * -1 and self.board[i - 3, j - 3] == self.player * -1 \
+                        and self.board[i - 4, j - 4] == self.player * -1:
+                    return True
+
+        return False
+
     def __repr__(self):
         if self.player == 1:
             player = 1
         else:
             player = 2
-        result = "Current Player is {0}\n".format(player)
+        result = "Current Player: Player {0}\n".format(player)
         for row in self.board:
             for cell in row:
                 if cell == 0:
@@ -75,13 +82,15 @@ class FiveInRowState(State):
 
 if __name__ == "__main__":
     state = FiveInRowState(size=10)
-    new_state = state.make_move((0, 0))
-    new_state = new_state.make_move((1, 1))
-    new_state = new_state.make_move((0, 1))
+    new_state = state.make_move((4, 0))
+    new_state = new_state.make_move((1, 2))
+    new_state = new_state.make_move((3, 1))
     new_state = new_state.make_move((9, 1))
-    new_state = new_state.make_move((0, 2))
+    new_state = new_state.make_move((2, 2))
     new_state = new_state.make_move((7, 2))
-    new_state = new_state.make_move((0, 3))
+    new_state = new_state.make_move((1, 3))
     new_state = new_state.make_move((9, 5))
+    print(new_state.is_terminal())
     new_state = new_state.make_move((0, 4))
+    print(new_state)
     print(new_state.is_terminal())
