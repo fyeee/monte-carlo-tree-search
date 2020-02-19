@@ -1,10 +1,11 @@
 from State import State
-from random import shuffle
+import random
 import numpy as np
 
 
 class FiveInRowState(State):
     def __init__(self, board=None, player=1, size=0):
+        super().__init__()
         if board is not None:
             self.size = len(board)
             self.board = board
@@ -17,13 +18,17 @@ class FiveInRowState(State):
             else:
                 raise AttributeError("Size should be greater than 0")
 
+    def available_moves(self):
+        result = []
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.board[i, j] == 0:
+                    result.append((i, j))
+        return result
+
     def pick_random_move(self):
-        flatten = list(enumerate(self.board.flatten()))
-        shuffle(flatten)
-        element = flatten.pop()
-        while element[1] != 0:
-            element = flatten.pop()
-        return element[0] // self.size, element[0] % self.size
+        all_moves = self.available_moves()
+        return random.choice(all_moves)
 
     def make_move(self, move):
         new_board = self.board.copy()
@@ -59,8 +64,10 @@ class FiveInRowState(State):
                         self.board[i - 2, j - 2] == self.player * -1 and self.board[i - 3, j - 3] == self.player * -1 \
                         and self.board[i - 4, j - 4] == self.player * -1:
                     return True
-
         return False
+
+    def get_reward(self):
+        return 1
 
     def __repr__(self):
         if self.player == 1:

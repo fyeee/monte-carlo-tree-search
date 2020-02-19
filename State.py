@@ -17,3 +17,11 @@ class State(ABC):
     @abstractmethod
     def make_move(self, move):
         pass
+
+    @abstractmethod
+    def available_moves(self):
+        pass
+
+    @abstractmethod
+    def get_reward(self):
+        pass
