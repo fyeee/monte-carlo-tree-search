@@ -1,4 +1,5 @@
 import math
+import random
 
 
 class Node:
@@ -10,6 +11,7 @@ class Node:
         self.parent = parent
         self.visits = 0
         self.reward = 0
+        self.unexplored = [self.state.available_moves()]
 
     def is_leaf(self):
         return self.state.is_terminal()
@@ -17,25 +19,28 @@ class Node:
     def get_UCT(self):
         return (self.reward / self.visits) + self.c * math.sqrt((math.log(self.parent.visit) / self.visits))
 
-    def add_child(self, state):
-        self.children.append(Node(state, self))
-
-    def expand(self):
-        move = self.state.pick_random_move()
-        self.add_child(self.state.make_move(move))
-        return move
+    def add_child(self, node):
+        self.children.append(node)
 
     def fully_expanded(self):
-        for move in self.state.available_moves():
-            if move not in self.children:
-                return False
-        return True
+        return len(self.state.available_moves()) == len(self.children)
 
-    def backpropagation(self):
-        node = self
-        winner = node.state.player * -1
-        reward = self.state.get_reward()
-        while node:
-            node.visits += 1
-            if node.state.player == winner:
-                node.reward += reward
+    def random_child(self):
+        node = Node(self.state.make_move(self.state.pick_random_move()), self)
+        self.add_child(node)
+        return node
+
+    def is_terminal(self):
+        return self.children == []
+
+    def get_best_child(self):
+        max_UCT = float("-inf")
+        best_child = None
+        for child in self.children:
+            if child.visits == 0:
+                return child
+            else:
+                if child.get_UCT() > max_UCT:
+                    max_UCT = child.get_UCT()
+                    best_child = child
+        return best_child
