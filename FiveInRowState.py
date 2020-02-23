@@ -40,8 +40,6 @@ class FiveInRowState(State):
             count_row = 0
             count_column = 0
             for j in range(self.size):
-                if count_row == 5 or count_column == 5:
-                    return True
                 if self.board[i, j] == self.player * -1:
                     count_row += 1
                 else:
@@ -50,6 +48,8 @@ class FiveInRowState(State):
                     count_column += 1
                 else:
                     count_column = 0
+            if count_row == 5 or count_column == 5:
+                return True
 
         for i in range(4, self.size):
             for j in range(self.size - 4):
@@ -64,10 +64,15 @@ class FiveInRowState(State):
                         self.board[i - 2, j - 2] == self.player * -1 and self.board[i - 3, j - 3] == self.player * -1 \
                         and self.board[i - 4, j - 4] == self.player * -1:
                     return True
-        return False
+        return self.available_moves() == []
 
     def get_reward(self):
-        return 1
+        if not self.available_moves():
+            return 0
+        elif self.player == 1:
+            return 1
+        elif self.player == -1:
+            return 0
 
     def __repr__(self):
         if self.player == 1:
@@ -88,16 +93,26 @@ class FiveInRowState(State):
 
 
 if __name__ == "__main__":
-    state = FiveInRowState(size=10)
-    new_state = state.make_move((4, 0))
-    new_state = new_state.make_move((1, 2))
-    new_state = new_state.make_move((3, 1))
-    new_state = new_state.make_move((9, 1))
+    state = FiveInRowState(size=5)
+    new_state = state.make_move((4, 1))
+    print(new_state)
     new_state = new_state.make_move((2, 2))
-    new_state = new_state.make_move((7, 2))
+    print(new_state)
+    new_state = new_state.make_move((0, 0))
+    print(new_state)
+    new_state = new_state.make_move((3, 2))
+    print(new_state)
+    new_state = new_state.make_move((0, 1))
+    print(new_state)
+    new_state = new_state.make_move((4, 2))
+    print(new_state)
     new_state = new_state.make_move((1, 3))
-    new_state = new_state.make_move((9, 5))
-    print(new_state.is_terminal())
+    print(new_state)
+    new_state = new_state.make_move((1, 2))
+    print(new_state)
     new_state = new_state.make_move((0, 4))
     print(new_state)
+    new_state = new_state.make_move((0, 2))
+    print(new_state)
+    print(new_state.get_reward())
     print(new_state.is_terminal())
